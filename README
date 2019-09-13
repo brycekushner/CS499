@@ -1,0 +1,84 @@
+Authors: Bryce Kushner & Sam McCauley
+
+Files: smalld.cpp, smallSet.cpp, smallGet.cpp, smallDigest.cpp, smallRun.cpp, 
+smalllib.cpp, Makefile, README. 
+
+Description: This is a small server and 4 client side applications that make 
+various requests to the server.
+
+Bugs & Limitations: 
+
+smalld.cpp:
+
+The basis of the server was constructed using the "Tiny Server" given to us
+in the textbook. This only provided the framework tohugh. After checking 
+for the correct number of arguments, the port and secret key were both 
+converted to unsigned ints using atoi(). Then the server was opened up and
+prepared to listen for incoming connections. When there's an incoming 
+connection the server first reads in the secret key and checks if it matches 
+the servers, as well as the reuqest type. If the server and connection secret 
+key matches it proceeds to either set, get, digest, or run based on the 
+request type. If it is set, the server reads in the necessary data and either 
+updates or creates a variable in the servers map with the given value. For 
+get, the server simply returns the value of the specified variable name. For 
+digest it reads in the given value and runs the command /bin/echo *value* | 
+/usr/bin/sha256sum. The output of this is sent back to the client to be printed. 
+The algorithm used for this inocation and output capture is popen and fgets. 
+This executes the command and allows for its output to be captured and read. 
+Finally, run takes in a value which specifies for one of three commands to 
+be executed. Just like digest, run does this using popen and fgets. For each 
+of these reuqests the server then prints out the secret key, request type, 
+completion status, and detail of the request. 
+
+smallSet.cpp:
+
+The programs for the client functions themselves don't do much. They simply 
+check for the correct number of arguments and then call a function for smallSet 
+that is contained in smalllib.cpp. 
+
+smallGet.cpp:
+
+smallGet operates much like smallRun. It checks for the correct number of 
+arguments and calls its function within smalllib.cpp.
+
+smallDigest.cpp:
+
+smallDigest operates like the previous 2 as well. It checks for the correct 
+number of arguments and then calls its function within smalllib.cpp.
+
+smallRun.cpp:
+
+smallRun operates like the other 3 clients. It checks for the correct number 
+of arguments and then calls its functon in smalllib.cpp.
+
+smalllib.cpp: This is the set of Library/API calls that handles creating a
+connection to the server and writing data to it. This contains all of the clients
+functions and handles writing their data to the server.
+
+  initialBuf() - This function creates the initial buffer that contains the
+  secret key, request type, and the 2 extra bytes of padding. This utilizes bit
+  shifting in creating the secret key and request type.
+
+  smallSet() - This handles the smallSet request. It eatablishes a connection
+  with the server and will be using the Rio functions for reading and writing
+  to and from the server. After writing the initial buffer with the secret key 
+  and request type, it composes and writes a buffer for the variable name, 
+  value length, and finally the actual value.
+
+  smallGet() - This handles the smallGet request. After establishing a
+  connection to the server it sends the initial buffer, followed by constructing
+  and sending the buffer with the variable name. After that it reads from the
+  server and if the variable name existed it and was successfully captured it
+  prints it out, otherwise it prints out failed. 
+
+  smallDigest() - This handles the smallDigest request.  After establishing a
+  connection to the server it sends the initial buffer, followed by sending the
+  value length, as well as the actual value. After this it then reads in the
+  output of the invocation done by the server using the value and prints it to
+  the screen.
+
+  smallRun() - This handles the smallRun request. After establishing a connection
+  to the server it sends the initial buffer, followed by a value that is the
+  request being made. It then reads in the output of the invocation related 
+  to the specific request and prints the output to the screen.
+ 
